@@ -8,7 +8,7 @@ export default function MatrixView({ tasksByQuadrant, incompleteTasks, onToggle,
   const uncategorized = incompleteTasks.filter(t => !t.quadrant);
   return (
     <div className="flex-1 overflow-y-auto flex flex-col pr-1">
-      <div className="grid grid-cols-2 grid-rows-[1fr_1fr] gap-3.5 flex-1 min-h-[500px]">
+      <div className="grid grid-cols-2 grid-rows-[1fr_1fr] gap-3.5 flex-1 min-h-[500px] max-md:grid-cols-1 max-md:grid-rows-[1fr_1fr_1fr_1fr] max-md:min-h-0">
         {Object.entries(QUADRANTS).map(([key, cfg]) => (
           <div key={key} className={`glass-card flex flex-col gap-1.5 p-[18px] overflow-y-auto !border-t-2 ${BORDERS[key]}`}>
             <div className="flex justify-between items-start mb-1">

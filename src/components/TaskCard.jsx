@@ -10,7 +10,7 @@ export default function TaskCard({
   const [showDelete, setShowDelete] = useState(false);
   const [showSubtasks, setShowSubtasks] = useState(false);
 
-  let classes = 'glass-card flex items-center justify-between px-4 py-3.5 transition-all duration-200 animate-slide-up';
+  let classes = 'glass-card flex items-center justify-between px-4 py-3.5 transition-all duration-200 animate-slide-up max-md:px-3 max-md:py-3';
   if (task.completed) classes += ' opacity-45';
   if (isFocused) classes += ' !bg-accent-blue/5';
 
@@ -28,7 +28,7 @@ export default function TaskCard({
       <div className="flex items-start gap-3 flex-1 min-w-0">
         {onDragStart && <span className="text-themed-muted cursor-grab select-none shrink-0 opacity-30 text-base hover:opacity-70 transition-opacity">⠿</span>}
 
-        <button className="w-[22px] h-[22px] rounded-md border-2 bg-transparent cursor-pointer flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 hover:scale-110"
+        <button className="w-[22px] h-[22px] rounded-md border-2 bg-transparent cursor-pointer flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 hover:scale-110 max-md:w-7 max-md:h-7 max-md:rounded-lg"
           style={{ borderColor: cfg.color }} onClick={(e) => onToggle(task.id, e)}>
           {task.completed && <span className="text-sm font-bold" style={{ color: cfg.color }}>✓</span>}
         </button>
@@ -72,12 +72,12 @@ export default function TaskCard({
         </div>
       </div>
 
-      <div className="flex items-center gap-0.5 shrink-0 relative">
-        <button className="w-7 h-7 rounded-md border-none bg-transparent text-themed-muted text-sm cursor-pointer flex items-center justify-center hover:bg-themed-surface hover:text-themed transition-all"
+      <div className="flex items-center gap-0.5 shrink-0 relative max-md:gap-1.5">
+        <button className="w-7 h-7 rounded-md border-none bg-transparent text-themed-muted text-sm cursor-pointer flex items-center justify-center hover:bg-themed-surface hover:text-themed transition-all max-md:w-9 max-md:h-9 max-md:text-base"
           onClick={() => onFocus(task.id)} title="Focus">{isFocused ? '🎯' : '⊙'}</button>
-        <button className="w-7 h-7 rounded-md border-none bg-transparent text-themed-muted text-sm cursor-pointer flex items-center justify-center hover:bg-themed-surface hover:text-themed transition-all"
+        <button className="w-7 h-7 rounded-md border-none bg-transparent text-themed-muted text-sm cursor-pointer flex items-center justify-center hover:bg-themed-surface hover:text-themed transition-all max-md:w-9 max-md:h-9 max-md:text-base"
           onClick={() => onEdit(task)} title="Edit">✎</button>
-        <button className="w-7 h-7 rounded-md border-none bg-transparent text-themed-muted text-sm cursor-pointer flex items-center justify-center hover:!text-accent-red hover:!bg-accent-red/10 transition-all"
+        <button className="w-7 h-7 rounded-md border-none bg-transparent text-themed-muted text-sm cursor-pointer flex items-center justify-center hover:!text-accent-red hover:!bg-accent-red/10 transition-all max-md:w-9 max-md:h-9 max-md:text-base"
           onClick={() => setShowDelete(s => !s)} title="Delete">🗑</button>
 
         {showDelete && (

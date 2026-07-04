@@ -2,7 +2,7 @@ import React from 'react';
 import HabitRing from './HabitRing';
 import ThemeSettings from './ThemeSettings';
 
-export default function Sidebar({ incompleteCount, todayCompletion, completionRate, habits, onToggleHabit, energySpent, activeSection, currentView, onNavigate, theme, onThemeChange }) {
+export default function Sidebar({ incompleteCount, todayCompletion, completionRate, habits, onToggleHabit, energySpent, activeSection, currentView, onNavigate, theme, onThemeChange, isMobileOpen, onMobileClose }) {
   const nav = [
     { section: 'tasks', view: 'focus',     icon: '☰',  label: 'Focus Flow' },
     { section: 'tasks', view: 'timeblock', icon: '◷',  label: 'Time-Block' },
@@ -17,17 +17,52 @@ export default function Sidebar({ incompleteCount, todayCompletion, completionRa
       ? activeSection === 'analytics'
       : activeSection === 'tasks' && currentView === n.view;
 
-  const wrapClass = 'w-[300px] shrink-0 flex flex-col gap-4 px-4 py-5 border-r border-themed overflow-y-auto bg-[rgba(0,0,0,0.08)] max-lg:w-[260px] max-md:w-full max-md:border-r-0';
+  const handleNav = (n) => {
+    onNavigate(n.section, n.view);
+    if (onMobileClose) onMobileClose();
+  };
+
+  // Desktop sidebar
+  const wrapClass = 'w-[300px] shrink-0 flex flex-col gap-4 px-4 py-5 border-r border-themed overflow-y-auto bg-[rgba(0,0,0,0.08)] max-lg:w-[260px] max-md:hidden';
 
   return (
-    <aside className={wrapClass}>
+    <>
+      {/* Desktop sidebar */}
+      <aside className={wrapClass}>
+        <SidebarContent {...{ incompleteCount, todayCompletion, completionRate, habits, onToggleHabit, energySpent, nav, isActive, handleNav, theme, onThemeChange }} />
+      </aside>
+
+      {/* Mobile overlay */}
+      <div className={`hidden max-md:block fixed inset-0 z-40 transition-opacity duration-300 ${isMobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={onMobileClose}>
+        <div className="absolute inset-0 bg-black/60" style={{backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)'}} />
+      </div>
+
+      {/* Mobile slide-in sidebar */}
+      <aside className={`hidden max-md:flex fixed top-0 left-0 bottom-0 z-50 w-[85vw] max-w-[320px] flex-col gap-4 px-4 py-5 overflow-y-auto bg-[var(--bg-deep)] border-r border-themed transition-transform duration-300 ease-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ boxShadow: '4px 0 40px rgba(0,0,0,0.4)' }}>
+        <SidebarContent {...{ incompleteCount, todayCompletion, completionRate, habits, onToggleHabit, energySpent, nav, isActive, handleNav, theme, onThemeChange, isMobile: true, onMobileClose }} />
+      </aside>
+    </>
+  );
+}
+
+function SidebarContent({ incompleteCount, todayCompletion, completionRate, habits, onToggleHabit, energySpent, nav, isActive, handleNav, theme, onThemeChange, isMobile, onMobileClose }) {
+  return (
+    <>
       {/* Brand */}
       <div className="flex items-center justify-between px-1 pb-4 border-b border-themed">
         <div className="flex items-center gap-2.5">
           <span className="text-2xl text-accent-purple drop-shadow-[0_0_10px_rgba(167,139,250,0.5)] animate-float">⬡</span>
           <span className="text-xl font-extrabold tracking-tight text-themed">Life<span className="text-grad-accent">OS</span></span>
         </div>
-        <span className="text-[10px] font-semibold text-themed-muted bg-themed-surface px-2 py-[3px] rounded-full tracking-wider">v3.0</span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-semibold text-themed-muted bg-themed-surface px-2 py-[3px] rounded-full tracking-wider">v3.0</span>
+          {isMobile && (
+            <button className="w-7 h-7 rounded-lg border border-themed bg-transparent text-themed-secondary text-sm cursor-pointer flex items-center justify-center hover:bg-themed-surface hover:text-themed transition-all"
+              onClick={onMobileClose}>✕</button>
+          )}
+        </div>
       </div>
 
       {/* Nav */}
@@ -39,7 +74,7 @@ export default function Sidebar({ incompleteCount, todayCompletion, completionRa
                 ? 'bg-accent-blue/10 text-accent-blue shadow-[inset_3px_0_0_#818cf8]'
                 : 'bg-transparent text-themed-secondary hover:bg-themed-surface hover:text-themed'
             }`}
-            onClick={() => onNavigate(n.section, n.view)}>
+            onClick={() => handleNav(n)}>
             <span className="text-base w-[22px] text-center shrink-0">{n.icon}</span>
             {n.label}
           </button>
@@ -85,6 +120,6 @@ export default function Sidebar({ incompleteCount, todayCompletion, completionRa
 
       {/* Theme settings */}
       <ThemeSettings theme={theme} onThemeChange={onThemeChange} />
-    </aside>
+    </>
   );
 }

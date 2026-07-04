@@ -61,7 +61,11 @@
 .light { color-scheme: light; }
 
 @layer base {
-  html { font-size: 14px; }
+  html {
+    font-size: 14px;
+    /* iOS Safari 100vh fix — use dynamic viewport height */
+    height: -webkit-fill-available;
+  }
 
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -70,6 +74,32 @@
     background: var(--bg-deepest);
     color: var(--text-primary);
     transition: background 0.3s ease, color 0.3s ease;
+    /* Mobile: prevent pull-to-refresh and overscroll bounce */
+    overscroll-behavior: none;
+    /* Mobile: prevent text size adjustment on orientation change */
+    -webkit-text-size-adjust: 100%;
+    /* Mobile: safe area for notched phones */
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    /* iOS Safari 100vh fix */
+    min-height: -webkit-fill-available;
+    min-height: 100vh;
+  }
+
+  /* Ensure root div fills height on iOS Safari */
+  #root {
+    min-height: -webkit-fill-available;
+    min-height: 100vh;
+  }
+
+  /* Mobile: better tap target defaults */
+  button, select, input, textarea, a {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Mobile: prevent long-press callout on iOS */
+  img, span, div {
+    -webkit-touch-callout: none;
   }
 
   ::-webkit-scrollbar { width: 5px; }
@@ -181,6 +211,16 @@
 }
 
 @layer utilities {
+  /* iOS Safari h-screen fix — use dynamic viewport height */
+  .h-screen {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+
   .bg-grad-high-focus { background: linear-gradient(90deg, #a78bfa, #f472b6); }
   .bg-grad-low-energy { background: linear-gradient(90deg, #34d399, rgba(52, 211, 153, 0.35)); }
   .bg-grad-accent     { background: linear-gradient(135deg, #818cf8, #a78bfa); }
@@ -198,4 +238,13 @@
   .bg-themed-input    { background: var(--input-bg); }
   .border-themed      { border-color: var(--border-light); }
   .border-themed-med  { border-color: var(--border-med); }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 }

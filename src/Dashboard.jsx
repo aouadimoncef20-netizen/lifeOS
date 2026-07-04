@@ -50,6 +50,7 @@ export default function Dashboard() {
   const [particle, setParticle] = useState(null);
   const [showCmdPalette, setShowCmdPalette] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [pomodoroSessions, setPomodoroSessions] = useStoredState('lifeos-pomo-sessions', []);
   const [pomodoroSettings, setPomodoroSettings] = useState({ focusMinutes: 25, breakMinutes: 5 });
 
@@ -420,48 +421,61 @@ export default function Dashboard() {
         <Sidebar incompleteCount={incompleteTasks.length} todayCompletion={todayCompletion}
           completionRate={completionRate} habits={habits} onToggleHabit={toggleHabit}
           energySpent={energySpent} activeSection={activeSection} currentView={currentView}
-          onNavigate={navigate} theme={theme} onThemeChange={handleThemeChange} />
+          onNavigate={navigate} theme={theme} onThemeChange={handleThemeChange}
+          isMobileOpen={mobileSidebarOpen} onMobileClose={() => setMobileSidebarOpen(false)} />
 
-        <main className="flex-1 flex flex-col overflow-hidden p-6 pr-7 min-w-0 max-md:p-4">
+        <main className="flex-1 flex flex-col overflow-hidden p-6 pr-7 min-w-0 max-md:p-3">
           {activeSection === 'tasks' ? (
             <>
-              <div className="flex items-center justify-between mb-6 shrink-0 gap-4 flex-wrap">
-                <div className="flex border-themed rounded-lg p-0.5 gap-0.5 bg-themed-surface/50">
-                  {VIEWS.map(v => (
-                    <button key={v.key}
-                      className={`px-4 py-2 border-none bg-transparent text-sm font-medium rounded-md cursor-pointer whitespace-nowrap transition-all duration-150 ${
-                        currentView === v.key ? 'bg-accent-blue/15 text-accent-blue shadow-[0_1px_8px_rgba(129,140,248,0.15)]' : 'text-themed-secondary hover:text-themed hover:bg-white/5'
-                      }`}
-                      onClick={() => setCurrentView(v.key)}>{v.icon} {v.label}</button>
-                  ))}
+              {/* Top bar: hamburger + view tabs + user */}
+              <div className="flex items-center justify-between mb-6 shrink-0 gap-3 flex-wrap">
+                <div className="flex items-center gap-3">
+                  {/* Mobile hamburger */}
+                  <button className="hidden max-md:flex w-9 h-9 rounded-lg border border-themed bg-transparent text-themed-secondary items-center justify-center cursor-pointer hover:bg-themed-surface hover:text-themed transition-all shrink-0 text-lg"
+                    onClick={() => setMobileSidebarOpen(true)} title="Menu">☰</button>
+
+                  {/* View tabs - scrollable on mobile */}
+                  <div className="flex border-themed rounded-lg p-0.5 gap-0.5 bg-themed-surface/50 overflow-x-auto scrollbar-none max-md:max-w-[calc(100vw-100px)]">
+                    {VIEWS.map(v => (
+                      <button key={v.key}
+                        className={`px-3 py-2 border-none bg-transparent text-sm font-medium rounded-md cursor-pointer whitespace-nowrap transition-all duration-150 max-md:px-2.5 max-md:text-xs ${
+                          currentView === v.key ? 'bg-accent-blue/15 text-accent-blue shadow-[0_1px_8px_rgba(129,140,248,0.15)]' : 'text-themed-secondary hover:text-themed hover:bg-white/5'
+                        }`}
+                        onClick={() => setCurrentView(v.key)}>
+                        <span className="md:hidden">{v.icon}</span>
+                        <span className="max-md:hidden">{v.icon} {v.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xs text-themed-muted hidden md:block">{user?.name}</span>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <span className="text-xs text-themed-muted hidden lg:block">{user?.name}</span>
                   <button className="text-xs text-themed-muted bg-transparent border-none cursor-pointer hover:text-accent-blue transition-colors font-inherit"
                     onClick={logout}>Logout</button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mb-4 shrink-0 gap-4 flex-wrap">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <select className="px-3 py-2 rounded-lg border border-themed bg-themed-input text-themed-secondary text-xs font-medium cursor-pointer outline-none transition-all font-inherit hover:border-themed-med hover:text-themed"
+              {/* Filter toolbar */}
+              <div className="flex items-center justify-between mb-4 shrink-0 gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 flex-wrap max-md:gap-1">
+                  <select className="px-2.5 py-2 rounded-lg border border-themed bg-themed-input text-themed-secondary text-xs font-medium cursor-pointer outline-none transition-all font-inherit hover:border-themed-med hover:text-themed max-md:px-2 max-md:text-[11px]"
                     value={filterPriority} onChange={e => setFilterPriority(e.target.value)}>
-                    <option value="all">All Priorities</option>
+                    <option value="all">All</option>
                     <option value="critical">Critical</option>
                     <option value="high">High</option>
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
                   </select>
 
-                  <select className="px-3 py-2 rounded-lg border border-themed bg-themed-input text-themed-secondary text-xs font-medium cursor-pointer outline-none transition-all font-inherit hover:border-themed-med hover:text-themed"
+                  <select className="px-2.5 py-2 rounded-lg border border-themed bg-themed-input text-themed-secondary text-xs font-medium cursor-pointer outline-none transition-all font-inherit hover:border-themed-med hover:text-themed max-md:px-2 max-md:text-[11px]"
                     value={filterEnergy} onChange={e => setFilterEnergy(e.target.value)}>
-                    <option value="all">All Energy</option>
-                    <option value="high">High Focus</option>
-                    <option value="low">Low Energy</option>
+                    <option value="all">⚡ All Energy</option>
+                    <option value="high">⚡ High</option>
+                    <option value="low">🧘 Low</option>
                   </select>
 
-                  <select className="px-2 py-1.5 rounded-lg border border-themed bg-themed-input text-themed-secondary text-[11px] cursor-pointer outline-none font-inherit"
+                  <select className="px-2 py-1.5 rounded-lg border border-themed bg-themed-input text-themed-secondary text-[11px] cursor-pointer outline-none font-inherit max-md:hidden"
                     value={sortBy} onChange={e => setSortBy(e.target.value)}>
                     <option value="created">Newest</option>
                     <option value="priority">Priority</option>
@@ -470,7 +484,7 @@ export default function Dashboard() {
                     <option value="pomodoro">Pomodoro</option>
                   </select>
 
-                  <div className="flex gap-0.5">
+                  <div className="flex gap-0.5 max-md:hidden">
                     <button className="px-2.5 py-1.5 rounded-lg border border-themed bg-transparent text-themed-muted text-[11px] cursor-pointer transition-all font-inherit hover:bg-themed-surface hover:text-themed disabled:opacity-25"
                       onClick={undo} disabled={history.past.length === 0}>Undo</button>
                     <button className="px-2.5 py-1.5 rounded-lg border border-themed bg-transparent text-themed-muted text-[11px] cursor-pointer transition-all font-inherit hover:bg-themed-surface hover:text-themed disabled:opacity-25"
@@ -479,9 +493,9 @@ export default function Dashboard() {
                       onClick={exportJSON}>Export</button>
                   </div>
 
-                  <button className="px-5 py-2 rounded-lg border-none bg-grad-accent text-white text-sm font-semibold cursor-pointer transition-all duration-150 whitespace-nowrap hover:shadow-[0_4px_20px_rgba(129,140,248,0.35)] hover:-translate-y-0.5 active:translate-y-0"
+                  <button className="px-4 py-2 rounded-lg border-none bg-grad-accent text-white text-sm font-semibold cursor-pointer transition-all duration-150 whitespace-nowrap hover:shadow-[0_4px_20px_rgba(129,140,248,0.35)] hover:-translate-y-0.5 active:translate-y-0 max-md:px-3 max-md:text-xs max-md:py-1.5"
                     onClick={() => { setEditingTask(null); setShowTaskForm(true); }}>
-                    + New Task
+                    + New
                   </button>
                 </div>
               </div>

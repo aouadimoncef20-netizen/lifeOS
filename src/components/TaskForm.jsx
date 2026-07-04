@@ -50,7 +50,7 @@ export default function TaskForm({ task, onSave, onClose }) {
           <input className={inputClass} placeholder="Task title..." value={form.title} onChange={e=>h('title',e.target.value)} autoFocus />
           <textarea className={inputClass + ' resize-y min-h-[60px]'} placeholder="Description..." value={form.description} onChange={e=>h('description',e.target.value)} rows={2} />
 
-          <div className="grid grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-2 gap-3.5 max-md:grid-cols-1">
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-semibold text-themed-muted uppercase tracking-wider">Priority</label>
               <div className="flex gap-1.5 flex-wrap">
@@ -77,7 +77,7 @@ export default function TaskForm({ task, onSave, onClose }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-2 gap-3.5 max-md:grid-cols-1">
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-semibold text-themed-muted uppercase tracking-wider">Tags</label>
               <input className={inputClass} placeholder="design, frontend..."

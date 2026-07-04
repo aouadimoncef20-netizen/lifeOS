@@ -18,12 +18,12 @@ export default function TimeBlock({ HOURS, tasksByHour, incompleteTasks, onToggl
           const ampm = hour >= 12 ? 'PM' : 'AM';
           const dh = hour > 12 ? hour - 12 : hour;
           return (
-            <div key={hour} className="flex gap-3 min-h-[52px] group">
-              <div className="w-[60px] shrink-0 flex items-start gap-1 pt-1">
-                <span className="text-sm font-bold text-themed-secondary tabular-nums">{dh}:00</span>
-                <span className="text-[10px] font-medium text-themed-muted">{ampm}</span>
+            <div key={hour} className="flex gap-3 min-h-[52px] group max-md:gap-2">
+              <div className="w-[60px] shrink-0 flex items-start gap-1 pt-1 max-md:w-[48px]">
+                <span className="text-sm font-bold text-themed-secondary tabular-nums max-md:text-xs">{dh}:00</span>
+                <span className="text-[10px] font-medium text-themed-muted max-md:hidden">{ampm}</span>
               </div>
-              <div className="flex-1 flex flex-col gap-[3px] py-0.5 border-l border-themed pl-4">
+              <div className="flex-1 flex flex-col gap-[3px] py-0.5 border-l border-themed pl-4 max-md:pl-3">
                 {tasks.map(task => (
                   <TaskCard key={task.id} task={task} onToggle={onToggle} onEdit={onEdit} onDelete={onDelete}
                     onFocus={onFocus} isFocused={activeTaskId===task.id} compact={true} onToggleSubtask={onToggleSubtask} />

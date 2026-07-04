@@ -120,11 +120,11 @@ export default function PomodoroTimer({
   return (
     <div className={barClass}>
       {/* main row */}
-      <div className="h-14 flex items-center justify-between px-6 w-full bg-themed-surface/70"
+      <div className="h-14 flex items-center justify-between px-6 w-full bg-themed-surface/70 max-md:px-3 max-md:h-12"
         style={{ backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 max-md:gap-2">
           {/* ring */}
-          <div className="relative w-10 h-10 shrink-0 cursor-pointer" onClick={() => setExpanded(e => !e)}
+          <div className="relative w-9 h-9 shrink-0 cursor-pointer max-md:w-8 max-md:h-8" onClick={() => setExpanded(e => !e)}
             title={expanded ? 'Collapse' : 'Show pomodoro details'}>
             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(128,128,128,0.12)" strokeWidth="5" />
@@ -137,42 +137,42 @@ export default function PomodoroTimer({
 
           {/* info */}
           <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-themed-secondary uppercase tracking-wider">
+            <div className="flex items-center gap-2 max-md:gap-1">
+              <span className="text-xs font-semibold text-themed-secondary uppercase tracking-wider max-md:text-[10px]">
                 {mode === 'focus' ? '🔴 Focus' : '🟢 Break'}
               </span>
-              <span className="text-[10px] text-themed-muted">
+              <span className="text-[10px] text-themed-muted max-md:hidden">
                 {mode === 'focus' ? `${focusMins}m` : `${breakMins}m`}
               </span>
             </div>
             {activeTask && mode === 'focus' ? (
-              <span className="text-sm text-themed max-w-[260px] truncate flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-accent-blue animate-pulse-glow" />
+              <span className="text-sm text-themed max-w-[260px] truncate flex items-center gap-2 max-md:max-w-[140px] max-md:text-xs">
+                <span className="inline-block w-2 h-2 rounded-full bg-accent-blue animate-pulse-glow shrink-0" />
                 {activeTask.title}
               </span>
             ) : mode === 'focus' && !activeTask ? (
-              <span className="text-sm text-themed-muted italic">Pick a task to start</span>
+              <span className="text-sm text-themed-muted italic max-md:text-xs">Pick a task</span>
             ) : (
-              <span className="text-sm text-accent-mint/80">{todaySessions} sessions today · {todayMinutes}m focused</span>
+              <span className="text-sm text-accent-mint/80 max-md:text-xs max-md:max-w-[120px] max-md:truncate">{todaySessions} sessions · {todayMinutes}m</span>
             )}
           </div>
         </div>
 
         {/* actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 max-md:gap-1">
           <span className="text-[11px] text-accent-blue font-semibold bg-accent-blue/10 px-2 py-1 rounded-md tabular-nums hidden sm:block">
             🍅 {todaySessions}
           </span>
 
-          <button className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-blue text-white cursor-pointer transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed hover:brightness-110 hover:shadow-[0_0_16px_rgba(129,140,248,0.35)] active:scale-95"
+          <button className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-blue text-white cursor-pointer transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed hover:brightness-110 hover:shadow-[0_0_16px_rgba(129,140,248,0.35)] active:scale-95 max-md:px-2 max-md:py-1.5 max-md:text-[11px]"
             onClick={toggle} disabled={!activeTask && mode === 'focus'}>
-            {running ? '⏸ Pause' : '▶ Start'}
+            {running ? '⏸' : '▶'}
           </button>
 
-          <button className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-transparent border border-themed text-themed-secondary cursor-pointer transition-all duration-150 hover:bg-themed-surface hover:text-themed active:scale-95"
-            onClick={reset}>↺ Reset</button>
+          <button className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-transparent border border-themed text-themed-secondary cursor-pointer transition-all duration-150 hover:bg-themed-surface hover:text-themed active:scale-95 max-md:px-2 max-md:py-1.5 max-md:text-[11px]"
+            onClick={reset}>↺</button>
 
-          <button className="w-7 h-7 rounded-md border border-themed bg-transparent text-themed-muted text-xs cursor-pointer flex items-center justify-center hover:bg-themed-surface hover:text-themed transition-all"
+          <button className="w-9 h-9 rounded-md border border-themed bg-transparent text-themed-muted text-xs cursor-pointer flex items-center justify-center hover:bg-themed-surface hover:text-themed transition-all max-md:w-8 max-md:h-8"
             onClick={() => setShowSettings(s => !s)} title="Timer settings">⚙</button>
         </div>
       </div>
