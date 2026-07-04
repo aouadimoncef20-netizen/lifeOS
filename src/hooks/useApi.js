@@ -1,6 +1,6 @@
 // Try the proxy path first, then direct URL as fallback
 const PROXY_URL = '/api';
-const DIRECT_URL = 'http://localhost:4000/api';
+const DIRECT_URL = "https://lifeos-39r2.onrender.com";
 
 let _onUnauthorized = null;
 
