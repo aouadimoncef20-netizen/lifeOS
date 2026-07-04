@@ -1,4 +1,6 @@
-const API = process.env.REACT_APP_API_URL || '/api';
+// Try the proxy path first, then direct URL as fallback
+const PROXY_URL = '/api';
+const DIRECT_URL = 'http://localhost:4000/api';
 
 let _onUnauthorized = null;
 
@@ -10,50 +12,77 @@ function getToken() {
   try { return localStorage.getItem('lifeos-token'); } catch { return null; }
 }
 
+// Timeout helper without AbortController (more portable)
+function timeoutPromise(ms) {
+  return new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms));
+}
+
 export async function request(method, path, body) {
   const headers = { 'Content-Type': 'application/json' };
   const token = getToken();
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
+  // Determine which base URL to use
+  const baseURL = localStorage.getItem('lifeos-api-url') || PROXY_URL;
+
   const opts = { method, headers };
   if (body && method !== 'GET') opts.body = JSON.stringify(body);
 
-  // Timeout after 8 seconds so the UI doesn't hang
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
-  opts.signal = controller.signal;
-
   let res;
   try {
-    res = await fetch(API + path, opts);
+    // Race the fetch against a timeout
+    res = await Promise.race([
+      fetch(baseURL + path, opts),
+      timeoutPromise(10000),
+    ]);
   } catch (err) {
-    clearTimeout(timeout);
-    // Network error — server not running or CORS issue
-    throw new Error(
-      'Cannot reach the server. Make sure the backend is running on port 4000.\n' +
-      'Run: cd server && npm start\n' +
-      'Error: ' + err.message
-    );
+    const msg = err.message === 'Request timed out'
+      ? 'Server is not responding. Make sure the backend is running:\n  cd server && npm start'
+      : 'Cannot connect to server. ' + err.message;
+    throw new Error(msg);
   }
 
-  clearTimeout(timeout);
-
-  // Check if the response is actually JSON
   const contentType = res.headers.get('content-type') || '';
 
+  // If proxy returned HTML, try direct connection
   if (!contentType.includes('application/json')) {
-    const text = await res.text().catch(() => '');
-    const hint = text.includes('<html') || text.includes('root')
-      ? 'Backend server is not running. Open a terminal and run:\n  cd server && npm start'
-      : 'Server returned non-JSON response (status ' + res.status + ')';
-    throw new Error(hint);
+    // Try direct URL as fallback
+    if (baseURL === PROXY_URL) {
+      try {
+        const directRes = await Promise.race([
+          fetch(DIRECT_URL + path, opts),
+          timeoutPromise(5000),
+        ]);
+        const directContentType = directRes.headers.get('content-type') || '';
+        if (directContentType.includes('application/json')) {
+          // Direct worked! Save it for future requests
+          localStorage.setItem('lifeos-api-url', DIRECT_URL);
+          res = directRes;
+        } else {
+          await directRes.text().catch(() => {});
+          throw new Error('Backend returned non-JSON. Make sure server is running on port 4000.');
+        }
+      } catch (e2) {
+        if (e2.message && e2.message.includes('Backend returned')) throw e2;
+        throw new Error(
+          'Backend not reachable. Open a terminal and run:\n' +
+          '  cd server\n  npm start\n\n' +
+          'Then refresh this page.'
+        );
+      }
+    } else {
+      await res.text().catch(() => {});
+      throw new Error(
+        'Server error. Make sure the backend is running:\n  cd server && npm start'
+      );
+    }
   }
 
   let data;
   try {
     data = await res.json();
   } catch (e) {
-    throw new Error('Failed to parse server response. The backend may have crashed.\nRun: cd server && npm start');
+    throw new Error('Server returned invalid data. Try restarting the backend.');
   }
 
   if (!res.ok) {

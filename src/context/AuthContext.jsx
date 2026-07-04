@@ -7,7 +7,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Register the global unauthorized handler that calls logout
   useEffect(() => {
     setUnauthorizedHandler(() => {
       localStorage.removeItem('lifeos-token');
@@ -15,7 +14,6 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
-  // On mount, check if we have a stored token and validate it
   useEffect(() => {
     const token = localStorage.getItem('lifeos-token');
     if (!token) {
@@ -23,15 +21,17 @@ export function AuthProvider({ children }) {
       return;
     }
 
+    let cancelled = false;
     api.me()
-      .then(u => {
-        setUser(u);
-        setLoading(false);
-      })
-      .catch(() => {
-        localStorage.removeItem('lifeos-token');
-        setLoading(false);
+      .then(u => { if (!cancelled) { setUser(u); setLoading(false); } })
+      .catch(e => {
+        if (!cancelled) {
+          localStorage.removeItem('lifeos-token');
+          setLoading(false);
+        }
       });
+
+    return () => { cancelled = true; };
   }, []);
 
   const login = useCallback(async (email, password) => {
