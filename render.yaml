@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: life-os
+    env: node
+    buildCommand: npm install --prefix server && npm run build
+    startCommand: cd server && node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://life-os.onrender.com
+      - key: PORT
+        value: "10000"
