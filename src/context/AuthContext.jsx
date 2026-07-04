@@ -3,6 +3,17 @@ import { api, setUnauthorizedHandler } from '../hooks/useApi';
 
 const AuthContext = createContext(null);
 
+// Decode JWT payload without a library (just base64)
+function decodeToken(token) {
+  try {
+    const payload = token.split('.')[1];
+    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,6 +25,8 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
+  // On mount: check if we have a token that's still valid
+  // Skip the API call — just decode the JWT and trust the expiry
   useEffect(() => {
     const token = localStorage.getItem('lifeos-token');
     if (!token) {
@@ -21,17 +34,18 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    let cancelled = false;
-    api.me()
-      .then(u => { if (!cancelled) { setUser(u); setLoading(false); } })
-      .catch(e => {
-        if (!cancelled) {
-          localStorage.removeItem('lifeos-token');
-          setLoading(false);
-        }
-      });
+    const payload = decodeToken(token);
+    if (!payload || payload.exp * 1000 < Date.now()) {
+      // Token expired or invalid
+      localStorage.removeItem('lifeos-token');
+      setLoading(false);
+      return;
+    }
 
-    return () => { cancelled = true; };
+    // Token looks valid — set a minimal user and go to dashboard
+    // Actual user data will be fetched when the Dashboard loads
+    setUser({ id: payload.id, name: payload.name || 'User' });
+    setLoading(false);
   }, []);
 
   const login = useCallback(async (email, password) => {

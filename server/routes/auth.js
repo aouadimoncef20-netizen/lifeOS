@@ -56,7 +56,7 @@ router.post('/signup', (req, res) => {
       insertTask.run(uid(), id, t.title, t.description, t.priority, t.energy);
     }
 
-    const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const token = jwt.sign({ id, name, email }, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.json({ token, user: { id, email, name } });
   } catch (err) {
     console.error('Signup error:', err);
@@ -76,7 +76,7 @@ router.post('/login', (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const token = jwt.sign({ id: user.id, name: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
   } catch (err) {
     console.error('Login error:', err);
