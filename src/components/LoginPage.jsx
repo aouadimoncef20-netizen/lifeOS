@@ -11,12 +11,15 @@ export default function LoginPage({ onSwitch }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
     setBusy(true);
     try {
       await login(email, password);
     } catch (err) {
       setError(err.message);
-    } finally {
       setBusy(false);
     }
   };
@@ -33,17 +36,32 @@ export default function LoginPage({ onSwitch }) {
         <h2 className="text-lg font-bold text-themed text-center mb-6">Welcome back</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input className="w-full px-3.5 py-2.5 rounded-lg border border-themed bg-themed-input text-themed text-sm outline-none transition-all focus:border-accent-blue/40 focus:shadow-[0_0_0_3px_rgba(129,140,248,0.08)] placeholder:text-themed-muted"
-            type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+          <input
+            className="w-full px-3.5 py-2.5 rounded-lg border border-themed bg-themed-input text-themed text-sm outline-none transition-all focus:border-accent-blue/40 focus:shadow-[0_0_0_3px_rgba(129,140,248,0.08)] placeholder:text-themed-muted"
+            type="email" placeholder="Email" value={email}
+            onChange={e => setEmail(e.target.value)} required autoFocus
+          />
 
-          <input className="w-full px-3.5 py-2.5 rounded-lg border border-themed bg-themed-input text-themed text-sm outline-none transition-all focus:border-accent-blue/40 focus:shadow-[0_0_0_3px_rgba(129,140,248,0.08)] placeholder:text-themed-muted"
-            type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+          <input
+            className="w-full px-3.5 py-2.5 rounded-lg border border-themed bg-themed-input text-themed text-sm outline-none transition-all focus:border-accent-blue/40 focus:shadow-[0_0_0_3px_rgba(129,140,248,0.08)] placeholder:text-themed-muted"
+            type="password" placeholder="Password" value={password}
+            onChange={e => setPassword(e.target.value)} required
+          />
 
-          {error && <div className="text-xs text-accent-red bg-accent-red/10 px-3 py-2 rounded-lg">{error}</div>}
+          {error && (
+            <div className="text-xs text-accent-red bg-accent-red/10 px-3 py-2 rounded-lg">{error}</div>
+          )}
 
-          <button className="w-full py-2.5 rounded-lg border-none bg-grad-accent text-white text-sm font-semibold cursor-pointer transition-all hover:shadow-[0_4px_20px_rgba(129,140,248,0.35)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
-            type="submit" disabled={busy}>
-            {busy ? 'Signing in...' : 'Sign In'}
+          <button
+            className="w-full py-2.5 rounded-lg border-none bg-grad-accent text-white text-sm font-semibold cursor-pointer transition-all hover:shadow-[0_4px_20px_rgba(129,140,248,0.35)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            type="submit" disabled={busy}
+          >
+            {busy ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Signing in...
+              </span>
+            ) : 'Sign In'}
           </button>
         </form>
 
@@ -52,6 +70,13 @@ export default function LoginPage({ onSwitch }) {
           <button className="text-accent-blue bg-transparent border-none cursor-pointer hover:underline font-inherit text-xs"
             onClick={onSwitch}>Create one</button>
         </p>
+
+        <div className="mt-4 pt-4 border-t border-themed text-center">
+          <p className="text-[10px] text-themed-muted">
+            Make sure the backend is running:<br />
+            <code className="text-accent-blue">cd server && npm start</code>
+          </p>
+        </div>
       </div>
     </div>
   );

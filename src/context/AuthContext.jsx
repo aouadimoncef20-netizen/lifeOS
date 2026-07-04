@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { api } from '../hooks/useApi';
+import { api, setUnauthorizedHandler } from '../hooks/useApi';
 
 const AuthContext = createContext(null);
 
@@ -7,16 +7,31 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Register the global unauthorized handler that calls logout
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      localStorage.removeItem('lifeos-token');
+      setUser(null);
+    });
+  }, []);
+
+  // On mount, check if we have a stored token and validate it
   useEffect(() => {
     const token = localStorage.getItem('lifeos-token');
-    if (token) {
-      api.me()
-        .then(u => setUser(u))
-        .catch(() => { localStorage.removeItem('lifeos-token'); })
-        .finally(() => setLoading(false));
-    } else {
+    if (!token) {
       setLoading(false);
+      return;
     }
+
+    api.me()
+      .then(u => {
+        setUser(u);
+        setLoading(false);
+      })
+      .catch(() => {
+        localStorage.removeItem('lifeos-token');
+        setLoading(false);
+      });
   }, []);
 
   const login = useCallback(async (email, password) => {

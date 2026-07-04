@@ -18,6 +18,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "server": "cd server && node index.js",
+    "dev": "node -e \"var c=require('child_process');c.spawn('node',['server/index.js'],{cwd:'server',stdio:'inherit',shell:true});c.spawn('npx',['react-scripts','start'],{stdio:'inherit',shell:true})\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
