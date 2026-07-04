@@ -210,17 +210,19 @@
   }
 }
 
-@layer utilities {
-  /* iOS Safari h-screen fix — use dynamic viewport height */
-  .h-screen {
-    height: 100vh;
-    height: -webkit-fill-available;
-  }
-  .min-h-screen {
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-  }
+/* iOS Safari 100dvh fix — override Tailwind's h-screen and min-h-screen */
+.h-screen {
+  height: 100vh !important;
+  height: -webkit-fill-available !important;
+  height: 100dvh !important;
+}
+.min-h-screen {
+  min-height: 100vh !important;
+  min-height: -webkit-fill-available !important;
+  min-height: 100dvh !important;
+}
 
+@layer utilities {
   .bg-grad-high-focus { background: linear-gradient(90deg, #a78bfa, #f472b6); }
   .bg-grad-low-energy { background: linear-gradient(90deg, #34d399, rgba(52, 211, 153, 0.35)); }
   .bg-grad-accent     { background: linear-gradient(135deg, #818cf8, #a78bfa); }
